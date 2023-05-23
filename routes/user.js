@@ -1,4 +1,7 @@
 const {Router} = require('express');
+const {check} = require('express-validator');
+
+const {validarErroresCampos} = require('../middlewares/validar-campos');
 const {
   userGet,
   userPut,
@@ -6,16 +9,52 @@ const {
   userDelete,
   userPatch,
 } = require('../controllers/user');
+const {
+  esRoleValido,
+  esEmailValido,
+  existeUsuarioPorId,
+} = require('../helpers/db-validators');
 const router = Router();
 
 //todas estas rutas en su url tienen adelante '/api/users'. No ejecuto el controller, solo lo paso por referencia.
 router.get('/', userGet);
 
-router.put('/:id', userPut);
+router.post(
+  '/',
+  [
+    check('name', 'El nombre es obligatorio').notEmpty(),
+    check('password', 'El password debe tener al menos 6 caracteres').isLength({
+      min: 6,
+    }),
+    //check('email', 'No tiene el formato de correo').isEmail(),
+    check('email').custom(esEmailValido),
+    //check('role', 'No es un rol valido').isIn(['ADMIN_ROLE', 'USER_ROLE']),
+    check('role').custom(esRoleValido),
+    validarErroresCampos,
+  ],
+  userPost
+);
 
-router.post('/', userPost);
+router.put(
+  '/:id',
+  [
+    check('id', 'No es un ID valido').isMongoId(),
+    check('id').custom(existeUsuarioPorId),
+    check('role').custom(esRoleValido),
+    validarErroresCampos,
+  ],
+  userPut
+);
 
-router.delete('/', userDelete);
+router.delete(
+  '/:id',
+  [
+    check('id', 'No es un ID valido').isMongoId(),
+    check('id').custom(existeUsuarioPorId),
+    validarErroresCampos,
+  ],
+  userDelete
+);
 
 router.patch('/', userPatch);
 
