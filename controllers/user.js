@@ -75,11 +75,17 @@ const userPut = async (req = request, res = response) => {
 //*DELETE CONTROLLER
 const userDelete = async (req = request, res = response) => {
   const {id} = req.params;
+
+  //const uid = req.uid; //! ESTE 'UID' ES EL QUE ME LLEGA POR REFERENCIA DESDE EL ARCHIVO validad-jwt.js
   //!Borrar fisicamente (NO RECOMENDADO xq perdemos la data desde MongoDB)
   //const userDeleted = await User.findByIdAndDelete(id);
   const userDeleted = await User.findByIdAndUpdate(id, {state: false});
+  const userAuthenticated = req.userAuthenticated; //! ESTE 'USERAUTHENTICATED' ES EL QUE ME LLEGA POR REFERENCIA DESDE EL ARCHIVO validad-jwt.js
+  console.log(userAuthenticated);
+
   res.json({
     userDeleted,
+    userAuthenticated,
   });
 };
 

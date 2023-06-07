@@ -34,7 +34,8 @@ const UsuarioSchema = Schema({
 
 //!Lo siguiente es para modificar el json que se manda como res al frontend. Sacando __v y el password. En finalUser ya no va a estar password ni __v
 UsuarioSchema.methods.toJSON = function () {
-  const {__v, password, ...finalUser} = this.toObject();
+  const {__v, password, _id, ...finalUser} = this.toObject();
+  finalUser.uid = _id;
   return finalUser;
 };
 

@@ -1,6 +1,8 @@
 const {Router} = require('express');
 const {check} = require('express-validator');
 
+const {validarJWT} = require('../middlewares/validar-jwt');
+const {isAdminRole, tieneRole} = require('../middlewares/validar-rol');
 const {validarErroresCampos} = require('../middlewares/validar-campos');
 const {
   userGet,
@@ -49,6 +51,9 @@ router.put(
 router.delete(
   '/:id',
   [
+    validarJWT,
+    //isAdminRole, //!esta ruta fuerza a que solo puedan deletear los admin
+    tieneRole('ADMIN_ROLE', 'VENTAS_ROLE'),
     check('id', 'No es un ID valido').isMongoId(),
     check('id').custom(existeUsuarioPorId),
     validarErroresCampos,
